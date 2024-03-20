@@ -32,7 +32,7 @@ rebuild_binary() {
     echo "==== REBUILDING BINARY ===="
    
     # TODO: make dir configurable? at least move it into this directory
-    cd ../linkerd2/proxy
+    cd ./linkerd2/proxy
     
     cargo build --release --bin linkerd2-proxy
 
@@ -42,7 +42,7 @@ rebuild_binary() {
 rebuild_docker_image() {
     echo "==== REBUILDING DOCKER IMAGE ($TAGGED_IMAGE) ===="
 
-    cd ../linkerd2
+    cd ./linkerd2
 
     docker build -t $TAGGED_IMAGE -f ./Dockerfile-proxy .
     
