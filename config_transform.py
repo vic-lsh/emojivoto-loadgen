@@ -1,4 +1,5 @@
 import yaml
+import argparse
 from pprint import pprint
 
 IMAGE_NAME = "docker.io/vicsli/lkd-proxy-dev25"
@@ -39,28 +40,38 @@ def override_security_context(template):
     template['spec']['containers'][0]['securityContext'] = new_ctx
 
 
-def transform(idx, entry):
+def transform(idx, entry, image_name, tag_name):
     entry_sanity_check(entry)
 
     template = entry['spec']['template']
 
-    set_image_and_tag(template, IMAGE_NAME, TAG_NAME)
+    set_image_and_tag(template, image_name, tag_name)
     override_security_context(template)
 
     return entry
 
 
 def main():
-    # Example usage:
-    yaml_data = read_yaml_file("../test.yaml")
+    parser = argparse.ArgumentParser(
+                    prog='config_transform',
+                    description='Given a linkerd-injected k8s config, transform it to use our custom proxy image.',
+                    epilog='See Vic for more help')
+    parser.add_argument('-f', '--file-in', required=True, help='input file')
+    parser.add_argument('-o', '--file-out', required=True, help='output file')
+    parser.add_argument('-i', '--image', required=True, help='image name')
+    parser.add_argument('-t', '--tag', required=True, help='tag name for the image')
+
+    args = parser.parse_args()
+
+    yaml_data = read_yaml_file(args.file_in)
     items = yaml_data[0]['items']
 
-    transformed = [transform(i, e) for i, e in enumerate(items)]
+    transformed = [transform(i, e, args.image, args.tag) for i, e in enumerate(items)]
     yaml_data[0]['items'] = transformed
 
     # NOTE: python reads the k8s generated YAML file as an array (of one item).
     # but it actually expects the file to be a dictionary.
-    write_yaml_file(yaml_data[0], "../transformed.yaml")
+    write_yaml_file(yaml_data[0], args.file_out)
 
 if __name__ == "__main__":
     main()
