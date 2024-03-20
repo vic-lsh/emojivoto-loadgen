@@ -1,0 +1,3 @@
+[submodule "linkerd2"]
+	path = linkerd2
+	url = git@github.com:vicshli/linkerd2.git
