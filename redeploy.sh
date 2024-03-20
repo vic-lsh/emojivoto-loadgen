@@ -2,14 +2,13 @@
 
 # the script does the following
 #
-# 1. gen new timestamp-based tag
-# 2. rebuild proxy image using new tag
+# 1. gen new timestamp-based unique identifier
+# 2. rebuild proxy image using new identifier
 # 3. push new image to docker hub
-# 4. tag new image as latest
-# 5. generate current app k8s deployment config, with linkerd injection applied
-# 6. modify deploy config to use our latest image
-# 7. check new deploy config validity
-# 8. apply new config
+# 4. generate current app k8s deployment config, with linkerd injection applied
+# 5. modify deploy config to use our latest image
+# 6. check new deploy config validity
+# 7. apply new config
 #
 # it assumes the app (e.g., emojivoto) is already deployed:
 # we're just updating the linkerd proxy it is using.
@@ -19,10 +18,10 @@ set -e
 SCRIPT_DIR=$(pwd)
 
 # docker stuff
-TAG=$(date +%s)  # gen unique tag based on unix timestamp
-IMAGE=vicsli/lkd-proxy-traced
+TAG="edge-24.2.5" # the expected tag is hard-coded into the deployed lkd ctl plane.
+SALT=$(date +%s)  # gen unique id based on unix timestamp
+IMAGE="vicsli/lkd-proxy-$SALT"
 TAGGED_IMAGE="$IMAGE:$TAG"
-TAGGED_IMAGE_LATEST="$IMAGE:latest"
 
 # k8s config stuff
 APP_NAMESPACE=emojivoto
@@ -51,19 +50,18 @@ rebuild_docker_image() {
 }
 
 push_new_image() {
-    echo "==== PUSHING $TAGGED_IMAGE as latest ===="
-    
-    docker tag $TAGGED_IMAGE $TAGGED_IMAGE_LATEST
+    echo "==== PUSHING $TAGGED_IMAGE ===="
 
     docker push $TAGGED_IMAGE
-    docker push $TAGGED_IMAGE_LATEST
 }
 
 gen_injected_config() {
-    echo "==== GETTING LINKERD INJECTED CONFIG ===="
+    PROXY_IMAGE="docker.io/$IMAGE"
+
+    echo "==== GETTING LINKERD INJECTED CONFIG (using image $PROXY_IMAGE) ===="
 
     kubectl get -n $APP_NAMESPACE deploy -o yaml  \
-     | linkerd inject --proxy-image docker.io/$IMAGE --manual - \
+     | linkerd inject --proxy-image $PROXY_IMAGE --manual - \
      > $INJECTED_CFG_PATH
 }
 
@@ -72,9 +70,7 @@ gen_transformed_config() {
     
     python3 ./config_transform.py \
         -f $INJECTED_CFG_PATH \
-        -o $MODIFIED_CFG_PATH \
-        -i $IMAGE \
-        -t latest
+        -o $MODIFIED_CFG_PATH
 }
 
 validate_config() {
