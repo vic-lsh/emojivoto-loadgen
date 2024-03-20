@@ -4,7 +4,7 @@
 
 URL=localhost:8080
 HTTP_URL=http://$URL
-DUR_SECS=5
+DUR_SECS=180
 
 healthcheck() {
     echo "first, a healthcheck..."
