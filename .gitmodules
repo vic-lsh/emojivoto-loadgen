@@ -1,3 +1,6 @@
 [submodule "linkerd2"]
 	path = linkerd2
 	url = git@github.com:vic-lsh/linkerd2.git
+[submodule "emojivoto"]
+	path = emojivoto
+	url = git@github.com:vic-lsh/emojivoto.git
