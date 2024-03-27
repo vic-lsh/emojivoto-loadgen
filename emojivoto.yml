@@ -106,39 +106,39 @@ spec:
             cpu: 100m
       serviceAccountName: emoji
 ---
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:
-    app.kubernetes.io/name: vote-bot
-    app.kubernetes.io/part-of: emojivoto
-    app.kubernetes.io/version: v11
-  name: vote-bot
-  namespace: emojivoto
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: vote-bot
-      version: v11
-  template:
-    metadata:
-      labels:
-        app: vote-bot
-        version: v11
-    spec:
-      containers:
-      - command:
-        - emojivoto-vote-bot
-        env:
-        - name: WEB_HOST
-          value: web-svc.emojivoto:80
-        image: docker.l5d.io/buoyantio/emojivoto-web:v11
-        name: vote-bot
-        resources:
-          requests:
-            cpu: 10m
----
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   labels:
+#     app.kubernetes.io/name: vote-bot
+#     app.kubernetes.io/part-of: emojivoto
+#     app.kubernetes.io/version: v11
+#   name: vote-bot
+#   namespace: emojivoto
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: vote-bot
+#       version: v11
+#   template:
+#     metadata:
+#       labels:
+#         app: vote-bot
+#         version: v11
+#     spec:
+#       containers:
+#       - command:
+#         - emojivoto-vote-bot
+#         env:
+#         - name: WEB_HOST
+#           value: web-svc.emojivoto:80
+#         image: docker.l5d.io/buoyantio/emojivoto-web:v11
+#         name: vote-bot
+#         resources:
+#           requests:
+#             cpu: 10m
+# ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -149,7 +149,7 @@ metadata:
   name: voting
   namespace: emojivoto
 spec:
-  replicas: 8
+  replicas: 4
   selector:
     matchLabels:
       app: voting-svc
