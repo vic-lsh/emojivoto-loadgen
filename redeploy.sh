@@ -70,7 +70,9 @@ gen_transformed_config() {
     
     python3 ./config_transform.py \
         -f $INJECTED_CFG_PATH \
-        -o $MODIFIED_CFG_PATH
+        -o $MODIFIED_CFG_PATH \
+        -g $IMAGE \
+        -t $TAG
 }
 
 validate_config() {

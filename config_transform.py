@@ -32,13 +32,18 @@ def override_security_context(template):
     }
     template['spec']['containers'][0]['securityContext'] = new_ctx
 
+def write_image_and_tag(template, image, tag):
+    image_and_tag = f"docker.io/{image}:{tag}"
+    template['spec']['containers'][0]['image'] = image_and_tag
+    #pprint(template)
 
-def transform(idx, entry):
+def transform(idx, entry, image, tag):
     entry_sanity_check(entry)
 
     template = entry['spec']['template']
 
     override_security_context(template)
+    write_image_and_tag(template, image, tag)
 
     return entry
 
@@ -50,13 +55,15 @@ def main():
                     epilog='See Vic for more help')
     parser.add_argument('-f', '--file-in', required=True, help='input file')
     parser.add_argument('-o', '--file-out', required=True, help='output file')
+    parser.add_argument('-g', '--image', required=True, help='docker image name')
+    parser.add_argument('-t', '--tag', required=True, help='tag name for the docker image')
 
     args = parser.parse_args()
 
     yaml_data = read_yaml_file(args.file_in)
     items = yaml_data[0]['items']
 
-    transformed = [transform(i, e) for i, e in enumerate(items)]
+    transformed = [transform(i, e, args.image, args.tag) for i, e in enumerate(items)]
     yaml_data[0]['items'] = transformed
 
     # NOTE: python reads the k8s generated YAML file as an array (of one item).
