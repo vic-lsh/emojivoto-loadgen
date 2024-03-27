@@ -10,9 +10,11 @@ to other applications, such as [DeathStarBench](https://github.com/delimitrou/De
 
 ### Cloning the repo
 
-You should clone recursively, including the `linkerd2` submodule.
+You should clone recursively:
 
-`linkerd2` also contains submodules that also needs to be cloned.
+```
+git clone --recurse-submodules git@github.com:vic-lsh/lkdbench.git
+```
 
 ### Running emojivoto
 
